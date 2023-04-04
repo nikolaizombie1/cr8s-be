@@ -3,7 +3,7 @@ use rocket::response::status::{Custom, NoContent};
 use rocket::http::Status;
 
 use crate::models::{Rustacean, NewRustacean};
-use crate::DbConn;
+use crate::rocket_routes::DbConn;
 use crate::repositories::RustaceanRepository;
 
 #[rocket::get("/rustaceans")]
