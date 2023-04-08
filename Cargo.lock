@@ -176,6 +176,7 @@ dependencies = [
  "rocket",
  "rocket_sync_db_pools",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
