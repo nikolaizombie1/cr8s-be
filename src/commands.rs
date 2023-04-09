@@ -1,7 +1,6 @@
-use argon2::{password_hash::{SaltString, rand_core::OsRng}, PasswordHasher};
 use diesel::{PgConnection, Connection};
 
-use crate::{models::NewUser, repositories::{UserRepository, RoleRepository}};
+use crate::{models::NewUser, repositories::{UserRepository, RoleRepository}, auth};
 
 fn load_db_connection() -> PgConnection {
     let database_url = std::env::var("DATABASE_URL")
@@ -13,11 +12,8 @@ fn load_db_connection() -> PgConnection {
 pub fn create_user(username: String, password: String, role_codes: Vec<String>) {
     let mut c = load_db_connection();
 
-    let salt = SaltString::generate(OsRng);
-    let argon = argon2::Argon2::default();
-    let password_hash = argon.hash_password(password.as_bytes(), &salt).unwrap();
-
-    let new_user = NewUser {username, password: password_hash.to_string()};
+    let password_hash = auth::hash_password(password).unwrap();
+    let new_user = NewUser {username, password: password_hash};
     let user = UserRepository::create(&mut c, new_user, role_codes).unwrap();
     println!("User created {:?}", user);
     let roles = RoleRepository::find_by_user(&mut c, &user).unwrap();
